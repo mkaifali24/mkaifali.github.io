@@ -202,33 +202,37 @@
   flex: none;
   display: grid;
   place-items: center;
-  font-size: 0.8rem;
+}
+
+.theme-toggle__symbol {
+  grid-area: 1 / 1;
+  width: 18px;
+  height: 18px;
+  color: var(--text);
+  transition:
+    opacity var(--dur-1) var(--ease-out),
+    transform var(--dur-1) var(--ease-out);
+}
+
+[data-theme="dark"] .theme-toggle__symbol--sun,
+[data-theme="light"] .theme-toggle__symbol--moon {
+  opacity: 0;
+  transform: scale(0.65) rotate(-24deg);
+}
+
+[data-theme="dark"] .theme-toggle__symbol--moon,
+[data-theme="light"] .theme-toggle__symbol--sun {
+  opacity: 1;
+  transform: scale(1) rotate(0);
 }
 
 .theme-toggle__label {
-  max-width: 0;
-  opacity: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  padding-right: 0;
-  line-height: 1.35;
-  transition:
-    max-width 0.4s var(--ease-out),
-    opacity 0.28s var(--ease-out),
-    padding 0.4s var(--ease-out);
-}
-
-.theme-toggle:hover .theme-toggle__label,
-.theme-toggle:focus-visible .theme-toggle__label {
   max-width: 5.5rem;
   opacity: 1;
+  overflow: hidden;
+  white-space: nowrap;
   padding-right: 0.9rem;
-}
-
-@media (max-width: 560px), (hover: none) {
-  .theme-toggle__label {
-    display: none;
-  }
+  line-height: 1.35;
 }
 
 @media (hover: none), (pointer: coarse) {
@@ -6048,11 +6052,11 @@
 }
 
 .sf.about__statement {
-  max-width: 40ch;
+  max-width: 55ch;
   margin-inline: auto;
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: clamp(1.5rem, 3vw, 2.9rem);
+  font-size: clamp(1.5rem, 2.8vw, 2.9rem);
   line-height: 1.32;
   letter-spacing: -0.02em;
   text-align: center;
@@ -15358,9 +15362,9 @@ html.lenis body {
 .stx-line,
 .sf-word.is-fill {
   transition:
-    opacity 0.18s linear,
-    filter 0.18s linear,
-    transform 0.25s var(--ease-out);
+    opacity 0.36s linear,
+    filter 0.1s linear,
+    transform 0.45s var(--ease-out);
 }
 
 .footer__headline .mask-inner[style] {

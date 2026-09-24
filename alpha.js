@@ -2,7 +2,6 @@
   const root = document.documentElement;
   const body = document.body;
   const themeButton = document.querySelector('.theme-toggle');
-  const themeIcon = themeButton?.querySelector('.theme-toggle__icon');
   const themeLabel = themeButton?.querySelector('.theme-toggle__label');
   const savedTheme = localStorage.getItem('alpha-theme');
   const preferredTheme = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
@@ -15,7 +14,6 @@
       themeButton.title = `Theme: ${theme}`;
       themeButton.setAttribute('aria-label', `Theme: ${theme}. Switch to ${nextTheme}.`);
     }
-    if (themeIcon) themeIcon.textContent = theme === 'dark' ? '●' : '○';
     if (themeLabel) themeLabel.textContent = theme;
   }
 
@@ -73,8 +71,9 @@
       const rect = line.getBoundingClientRect();
       const center = rect.top + rect.height / 2;
       const proximity = Math.max(0, 1 - Math.abs(center - viewportHeight * 0.46) / (viewportHeight * 0.45));
-      line.style.opacity = String(0.14 + proximity * 0.86);
-      line.style.filter = `blur(${(1 - proximity) * 1.4}px)`;
+      const isInFocus = proximity >= 0.6;
+      line.style.opacity = isInFocus ? '1' : '0.14';
+      line.style.filter = isInFocus ? 'none' : 'blur(1.4px)';
       line.style.transform = `translateY(${(1 - proximity) * 7}px)`;
     });
 
@@ -83,9 +82,9 @@
       const progress = Math.max(0, Math.min(1, (viewportHeight * 0.82 - rect.top) / (rect.height + viewportHeight * 0.28)));
       const frontier = progress * (aboutWords.length + 6);
       aboutWords.forEach((word, index) => {
-        const reveal = Math.max(0, Math.min(1, frontier - index));
-        word.style.opacity = String(0.16 + reveal * 0.84);
-        word.style.filter = `blur(${(1 - reveal) * 1.25}px)`;
+        const isRevealed = frontier >= index + 0.5;
+        word.style.opacity = isRevealed ? '1' : '0.16';
+        word.style.filter = isRevealed ? 'none' : 'blur(1.25px)';
       });
     }
   };

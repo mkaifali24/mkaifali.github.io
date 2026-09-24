@@ -6,6 +6,7 @@
   const themeLabel = themeButton?.querySelector('.theme-toggle__label');
   const savedTheme = localStorage.getItem('alpha-theme');
   const preferredTheme = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
 
   function setTheme(theme) {
     root.dataset.theme = theme;
@@ -29,6 +30,75 @@
     scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
   });
 
+  const dotgrid = document.querySelector('.dotgrid');
+  const dotTorch = dotgrid?.querySelector('.dotgrid__torch');
+  const dotTorchFill = dotTorch?.querySelector('.dotgrid__torch-fill');
+  const finePointer = matchMedia('(hover: hover) and (pointer: fine)');
+
+  if (dotgrid && dotTorch && dotTorchFill && finePointer.matches) {
+    const torchRadius = dotTorch.offsetWidth / 2;
+    const illuminateDots = (event) => {
+      const left = event.clientX - torchRadius;
+      const top = event.clientY - torchRadius;
+      dotTorch.style.transform = `translate3d(${left}px, ${top}px, 0)`;
+      dotTorchFill.style.width = `${innerWidth}px`;
+      dotTorchFill.style.height = `${innerHeight}px`;
+      dotTorchFill.style.transform = `translate3d(${-left}px, ${-top}px, 0)`;
+    };
+
+    addEventListener('pointermove', illuminateDots, { passive: true });
+    document.documentElement.addEventListener('mouseleave', () => {
+      dotTorch.style.transform = 'translate3d(-9999px, -9999px, 0)';
+    });
+  }
+
+  const statementLines = [...document.querySelectorAll('.stx-line')];
+  const aboutSection = document.querySelector('.about');
+  const aboutWords = [...document.querySelectorAll('.sf-word.is-fill')];
+  let textFrame = 0;
+
+  const updateScrollText = () => {
+    textFrame = 0;
+    if (reduceMotion.matches) {
+      [...statementLines, ...aboutWords].forEach((item) => {
+        item.style.opacity = '1';
+        item.style.filter = 'none';
+        item.style.transform = 'none';
+      });
+      return;
+    }
+
+    const viewportHeight = innerHeight;
+    statementLines.forEach((line) => {
+      const rect = line.getBoundingClientRect();
+      const center = rect.top + rect.height / 2;
+      const proximity = Math.max(0, 1 - Math.abs(center - viewportHeight * 0.46) / (viewportHeight * 0.45));
+      line.style.opacity = String(0.14 + proximity * 0.86);
+      line.style.filter = `blur(${(1 - proximity) * 1.4}px)`;
+      line.style.transform = `translateY(${(1 - proximity) * 7}px)`;
+    });
+
+    if (aboutSection && aboutWords.length) {
+      const rect = aboutSection.getBoundingClientRect();
+      const progress = Math.max(0, Math.min(1, (viewportHeight * 0.82 - rect.top) / (rect.height + viewportHeight * 0.28)));
+      const frontier = progress * (aboutWords.length + 6);
+      aboutWords.forEach((word, index) => {
+        const reveal = Math.max(0, Math.min(1, frontier - index));
+        word.style.opacity = String(0.16 + reveal * 0.84);
+        word.style.filter = `blur(${(1 - reveal) * 1.25}px)`;
+      });
+    }
+  };
+
+  const queueScrollText = () => {
+    if (!textFrame) textFrame = requestAnimationFrame(updateScrollText);
+  };
+
+  addEventListener('scroll', queueScrollText, { passive: true });
+  addEventListener('resize', queueScrollText, { passive: true });
+  reduceMotion.addEventListener?.('change', queueScrollText);
+  queueScrollText();
+
   const toggle = document.querySelector('.menu__toggle');
   const header = document.querySelector('.menu');
   if (toggle && header) {
@@ -39,7 +109,7 @@
     overlay.innerHTML = `
       <div class="menu-overlay__inner container">
         <ol class="menu-overlay__list">
-          <li class="menu-overlay__item"><a class="menu-overlay__link" href="#services"><span class="menu-overlay__idx">01</span><span class="menu-overlay__word-wrap"><span class="menu-overlay__word">Services</span></span></a></li>
+          <li class="menu-overlay__item"><a class="menu-overlay__link" href="#services"><span class="menu-overlay__idx">01</span><span class="menu-overlay__word-wrap"><span class="menu-overlay__word">Skills</span></span></a></li>
           <li class="menu-overlay__item"><a class="menu-overlay__link" href="#work"><span class="menu-overlay__idx">02</span><span class="menu-overlay__word-wrap"><span class="menu-overlay__word">Work</span></span></a></li>
           <li class="menu-overlay__item"><a class="menu-overlay__link" href="#about"><span class="menu-overlay__idx">03</span><span class="menu-overlay__word-wrap"><span class="menu-overlay__word">About</span></span></a></li>
           <li class="menu-overlay__item"><a class="menu-overlay__link" href="#contact"><span class="menu-overlay__idx">04</span><span class="menu-overlay__word-wrap"><span class="menu-overlay__word">Contact</span></span></a></li>
@@ -79,7 +149,6 @@
   const blob = document.querySelector('.floating-blob');
   const blobAnchor = document.querySelector('#blob-header-anchor');
   const blobCanvas = blob?.querySelector('canvas');
-  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
 
   if (blob && blobAnchor && blobCanvas) {
     const context = blobCanvas.getContext('2d');

@@ -3160,6 +3160,7 @@
 .pcard__media {
   position: relative;
   overflow: hidden;
+  border-radius: inherit;
 }
 
 .pcard__media .media-ph {
@@ -3181,6 +3182,8 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: var(--media-position, center center);
+  display: block;
   z-index: 1;
   transition: transform 0.7s var(--ease-out);
 }
@@ -15343,8 +15346,8 @@ html.lenis body {
   transition-behavior: allow-discrete;
 }
 
-/* Standalone-page corrections: the supplied markup was captured after the
-   original site's animation runtime had applied its initial inline states. */
+/* Standalone-page corrections: keep captured layout states visible while the
+   lightweight interaction runtime drives only opacity and text emphasis. */
 .pcard[style],
 .seeall[style],
 .footer__top > div[style] {
@@ -15352,27 +15355,16 @@ html.lenis body {
   transform: none !important;
 }
 
-.stx-line[style],
-.sf-word.is-fill[style] {
-  opacity: 1 !important;
-  transform: none !important;
+.stx-line,
+.sf-word.is-fill {
+  transition:
+    opacity 0.18s linear,
+    filter 0.18s linear,
+    transform 0.25s var(--ease-out);
 }
 
 .footer__headline .mask-inner[style] {
   transform: none !important;
-}
-
-.menu__logo-slot::before {
-  content: "RB";
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  border: 1px solid var(--line-strong);
-  border-radius: 50%;
-  color: var(--text);
-  font: 600 0.78rem/1 var(--font-label);
-  letter-spacing: -0.03em;
 }
 
 .menu-overlay[hidden] {

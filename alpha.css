@@ -15392,3 +15392,63 @@ html.lenis body {
     animation: none;
   }
 }
+
+/* Dedicated work page */
+.work-page .gallery {
+  min-height: 100svh;
+  padding-top: clamp(8rem, 16vh, 12rem);
+}
+
+.gallery__statement .stx-line {
+  display: block;
+}
+
+.work-page .pcard {
+  display: block;
+  scroll-margin-top: calc(var(--header-h) + 1.5rem);
+  transition:
+    transform 0.45s var(--ease-out),
+    border-color 0.45s var(--ease-out),
+    box-shadow 0.45s var(--ease-out);
+}
+
+.work-page .pcard:hover {
+  transform: translateY(-4px);
+}
+
+.pcard__hit {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  border-radius: inherit;
+}
+
+[data-theme="light"] .pcard {
+  border-color: transparent;
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.13),
+    0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .pcard__media {
+  border-color: transparent;
+}
+
+[data-theme="light"] .pcard:hover {
+  border-color: transparent;
+  box-shadow:
+    0 18px 42px rgba(0, 0, 0, 0.18),
+    0 5px 14px rgba(0, 0, 0, 0.1);
+}
+
+@media (hover: none), (pointer: coarse) {
+  .work-page .pcard__scrim {
+    opacity: 1;
+  }
+
+  .work-page .pcard__label,
+  .work-page .pcard__arrow {
+    opacity: 1;
+    transform: none;
+  }
+}

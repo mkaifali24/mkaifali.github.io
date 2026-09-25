@@ -108,10 +108,10 @@
     overlay.innerHTML = `
       <div class="menu-overlay__inner container">
         <ol class="menu-overlay__list">
-          <li class="menu-overlay__item"><a class="menu-overlay__link" href="#services"><span class="menu-overlay__idx">01</span><span class="menu-overlay__word-wrap"><span class="menu-overlay__word">Skills</span></span></a></li>
-          <li class="menu-overlay__item"><a class="menu-overlay__link" href="#work"><span class="menu-overlay__idx">02</span><span class="menu-overlay__word-wrap"><span class="menu-overlay__word">Work</span></span></a></li>
-          <li class="menu-overlay__item"><a class="menu-overlay__link" href="#about"><span class="menu-overlay__idx">03</span><span class="menu-overlay__word-wrap"><span class="menu-overlay__word">About</span></span></a></li>
-          <li class="menu-overlay__item"><a class="menu-overlay__link" href="#contact"><span class="menu-overlay__idx">04</span><span class="menu-overlay__word-wrap"><span class="menu-overlay__word">Contact</span></span></a></li>
+          <li class="menu-overlay__item"><a class="menu-overlay__link" href="/#services"><span class="menu-overlay__idx">01</span><span class="menu-overlay__word-wrap"><span class="menu-overlay__word">Skills</span></span></a></li>
+          <li class="menu-overlay__item"><a class="menu-overlay__link" href="/work"><span class="menu-overlay__idx">02</span><span class="menu-overlay__word-wrap"><span class="menu-overlay__word">Work</span></span></a></li>
+          <li class="menu-overlay__item"><a class="menu-overlay__link" href="/#about"><span class="menu-overlay__idx">03</span><span class="menu-overlay__word-wrap"><span class="menu-overlay__word">About</span></span></a></li>
+          <li class="menu-overlay__item"><a class="menu-overlay__link" href="/#contact"><span class="menu-overlay__idx">04</span><span class="menu-overlay__word-wrap"><span class="menu-overlay__word">Contact</span></span></a></li>
         </ol>
       </div>`;
     header.insertAdjacentElement('afterend', overlay);

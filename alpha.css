@@ -3297,7 +3297,8 @@
 .pcard__award {
   position: absolute;
   top: clamp(0.8rem, 1.6vw, 1.3rem);
-  left: clamp(0.8rem, 1.6vw, 1.3rem);
+  right: clamp(0.8rem, 1.6vw, 1.3rem);
+  left: auto;
   z-index: 4;
   display: inline-flex;
   align-items: center;
@@ -3393,30 +3394,38 @@
   transition: transform 1.1s var(--ease-out) 0.08s;
 }
 
-.pcard__award--winner {
+.pcard__award--winner,
+.pcard__award--entry {
   border-color: transparent;
   background:
     linear-gradient(180deg, #100f0dc7, #080809d6) padding-box,
     linear-gradient(150deg, #e8c47899, #785a2838 45%, #e8c47873) border-box;
 }
 
-.pcard__award--winner .pcard__award-copy strong {
+.pcard__award--winner .pcard__award-copy strong,
+.pcard__award--entry .pcard__award-copy strong {
   color: #ecd39c;
 }
 
-.pcard__award--winner .pcard__award-copy em {
+.pcard__award--winner .pcard__award-copy em,
+.pcard__award--entry .pcard__award-copy em {
   color: #d8b46aad;
 }
 
-.pcard:hover .pcard__award--winner {
+.pcard__award--entry .pcard__award-medal stop:first-child {
+  stop-color: #f2d89b;
+}
+
+.pcard__award--entry .pcard__award-medal stop:last-child {
+  stop-color: #9b7134;
+}
+
+.pcard:hover .pcard__award--winner,
+.pcard:hover .pcard__award--entry {
   box-shadow:
     inset 0 1px #ffffff1f,
     0 2px 14px #0000004d,
     0 0 18px #d8b46a33;
-}
-
-.pcard:hover .pcard__award--entry {
-  border-color: #edede866;
 }
 
 @media (max-width: 720px) {

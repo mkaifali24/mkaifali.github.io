@@ -3,16 +3,26 @@
   const body = document.body;
   const themeButton = document.querySelector('.theme-toggle');
   const themeLabel = themeButton?.querySelector('.theme-toggle__label');
-  const savedTheme = localStorage.getItem('alpha-theme');
-  const preferredTheme = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  const colorSchemeQuery = matchMedia('(prefers-color-scheme: light)');
+  let savedTheme = null;
+
+  try {
+    savedTheme = localStorage.getItem('alpha-theme');
+  } catch {
+    savedTheme = null;
+  }
+
+  const preferredTheme = colorSchemeQuery.matches ? 'light' : 'dark';
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
 
   function setTheme(theme) {
     root.dataset.theme = theme;
+    root.style.colorScheme = theme;
     const nextTheme = theme === 'dark' ? 'light' : 'dark';
     if (themeButton) {
       themeButton.title = `Theme: ${theme}`;
       themeButton.setAttribute('aria-label', `Theme: ${theme}. Switch to ${nextTheme}.`);
+      themeButton.setAttribute('aria-pressed', theme === 'light' ? 'true' : 'false');
     }
     if (themeLabel) themeLabel.textContent = theme;
   }
@@ -20,8 +30,17 @@
   setTheme(savedTheme || preferredTheme);
   themeButton?.addEventListener('click', () => {
     const theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
-    localStorage.setItem('alpha-theme', theme);
+    savedTheme = theme;
+    try {
+      localStorage.setItem('alpha-theme', theme);
+    } catch {
+      // Theme switching still works when browser storage is unavailable.
+    }
     setTheme(theme);
+  });
+
+  colorSchemeQuery.addEventListener?.('change', (event) => {
+    if (!savedTheme) setTheme(event.matches ? 'light' : 'dark');
   });
 
   document.querySelector('.footer__back-top')?.addEventListener('click', () => {
@@ -47,6 +66,81 @@
     addEventListener('pointermove', illuminateDots, { passive: true });
     document.documentElement.addEventListener('mouseleave', () => {
       dotTorch.style.transform = 'translate3d(-9999px, -9999px, 0)';
+    });
+  }
+
+  const banner = document.querySelector('.home-banner');
+
+  if (banner) {
+    const bannerItems = [
+      banner.querySelector('.home-banner__eyebrow'),
+      banner.querySelector('h1'),
+      banner.querySelector('h2'),
+      banner.querySelector('.home-banner__intro'),
+      banner.querySelector('.home-banner__actions'),
+      banner.querySelector('.home-banner__tags'),
+      banner.querySelector('.home-banner__art'),
+      ...banner.querySelectorAll('.banner-service'),
+    ].filter(Boolean);
+
+    if (!reduceMotion.matches) {
+      requestAnimationFrame(() => {
+        bannerItems.forEach((item, index) => {
+          item.animate?.(
+            [
+              { opacity: 0, transform: 'translateY(22px)' },
+              { opacity: 1, transform: 'translateY(0)' },
+            ],
+            {
+              duration: 720,
+              delay: 50 + index * 65,
+              easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+              fill: 'backwards',
+            },
+          );
+        });
+      });
+    }
+
+    const bannerArt = banner.querySelector('.home-banner__art');
+    if (bannerArt && finePointer.matches && !reduceMotion.matches) {
+      let artFrame = 0;
+      let pointerX = 0;
+      let pointerY = 0;
+
+      const updateArtworkTilt = () => {
+        artFrame = 0;
+        const rect = bannerArt.getBoundingClientRect();
+        const x = (pointerX - rect.left) / rect.width - 0.5;
+        const y = (pointerY - rect.top) / rect.height - 0.5;
+        bannerArt.style.setProperty('--banner-tilt-x', `${-y * 4}deg`);
+        bannerArt.style.setProperty('--banner-tilt-y', `${x * 5}deg`);
+        bannerArt.style.setProperty('--banner-art-scale', '1.012');
+      };
+
+      bannerArt.addEventListener('pointermove', (event) => {
+        pointerX = event.clientX;
+        pointerY = event.clientY;
+        if (!artFrame) artFrame = requestAnimationFrame(updateArtworkTilt);
+      });
+
+      bannerArt.addEventListener('pointerleave', () => {
+        if (artFrame) cancelAnimationFrame(artFrame);
+        artFrame = 0;
+        bannerArt.style.removeProperty('--banner-tilt-x');
+        bannerArt.style.removeProperty('--banner-tilt-y');
+        bannerArt.style.removeProperty('--banner-art-scale');
+      });
+    }
+
+    banner.querySelectorAll('a[href^="#"]').forEach((link) => {
+      link.addEventListener('click', (event) => {
+        const target = document.querySelector(link.getAttribute('href'));
+        if (!target) return;
+        event.preventDefault();
+        const top = target.getBoundingClientRect().top + scrollY - 24;
+        scrollTo({ top, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+      });
     });
   }
 
@@ -143,81 +237,6 @@
     addEventListener('keydown', (event) => {
       if (event.key === 'Escape' && !overlay.hidden) closeMenu();
     });
-  }
-
-  const blob = document.querySelector('.floating-blob');
-  const blobAnchor = document.querySelector('#blob-header-anchor');
-  const blobCanvas = blob?.querySelector('canvas');
-
-  if (blob && blobAnchor && blobCanvas) {
-    const context = blobCanvas.getContext('2d');
-    if (!context) return;
-    let frame = 0;
-    let targetX = 0;
-    let targetY = 0;
-    let currentX = 0;
-    let currentY = 0;
-
-    const locateBlob = () => {
-      const anchor = blobAnchor.getBoundingClientRect();
-      targetX = anchor.left + anchor.width / 2 - 60;
-      targetY = anchor.top + anchor.height / 2 - 60;
-      if (!frame) {
-        currentX = targetX;
-        currentY = targetY;
-      }
-    };
-
-    const drawBlob = (time = 0) => {
-      const dpr = Math.min(devicePixelRatio || 1, 2);
-      const size = 120;
-      if (blobCanvas.width !== size * dpr || blobCanvas.height !== size * dpr) {
-        blobCanvas.width = size * dpr;
-        blobCanvas.height = size * dpr;
-      }
-      context.setTransform(dpr, 0, 0, dpr, 0, 0);
-      context.clearRect(0, 0, size, size);
-
-      const phase = reduceMotion.matches ? 0 : time * 0.00065;
-      const points = 10;
-      const center = size / 2;
-      const radius = 31;
-      context.beginPath();
-      for (let i = 0; i <= points; i += 1) {
-        const angle = (i / points) * Math.PI * 2;
-        const wobble = Math.sin(angle * 3 + phase * 2.1) * 4 + Math.cos(angle * 5 - phase) * 2.5;
-        const x = center + Math.cos(angle) * (radius + wobble);
-        const y = center + Math.sin(angle) * (radius + wobble);
-        if (i === 0) context.moveTo(x, y);
-        else context.lineTo(x, y);
-      }
-      context.closePath();
-
-      const isLight = root.dataset.theme === 'light';
-      const gradient = context.createRadialGradient(47, 43, 4, center, center, 39);
-      if (isLight) {
-        gradient.addColorStop(0, '#6e665b');
-        gradient.addColorStop(0.55, '#332f2a');
-        gradient.addColorStop(1, '#171614');
-      } else {
-        gradient.addColorStop(0, '#fffdf6');
-        gradient.addColorStop(0.5, '#c8c0b3');
-        gradient.addColorStop(1, '#6c6257');
-      }
-      context.fillStyle = gradient;
-      context.shadowColor = isLight ? 'rgba(0, 0, 0, .24)' : 'rgba(255, 246, 226, .2)';
-      context.shadowBlur = 18;
-      context.fill();
-
-      currentX += (targetX - currentX) * 0.12;
-      currentY += (targetY - currentY) * 0.12;
-      blob.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
-      frame = requestAnimationFrame(drawBlob);
-    };
-
-    locateBlob();
-    addEventListener('resize', locateBlob, { passive: true });
-    frame = requestAnimationFrame(drawBlob);
   }
 
   const cursor = document.querySelector('.cursor-dot');
